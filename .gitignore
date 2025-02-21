@@ -6,3 +6,6 @@
 
 # Configuration file with private information
 settings.yaml
+
+# Prevent log file tracking
+*.log
