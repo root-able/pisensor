@@ -142,4 +142,4 @@ def scd41_use(config_file_name: str) -> None:
 
 
 # MAIN
-scd41_use("settings.template.yaml")
+scd41_use("settings.yaml")
