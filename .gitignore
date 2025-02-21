@@ -1,0 +1,8 @@
+# Local environment for Python
+.venv
+
+# Local environment for IDE
+.idea
+
+# Configuration file with private information
+settings.yaml

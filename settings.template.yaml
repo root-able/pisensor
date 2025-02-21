@@ -1,0 +1,6 @@
+home_assistant:
+  host: "<HASS_HOST>"
+  token: "<HASS_TOKEN>"
+  port: 8123
+  device: "/dev/i2c-1"
+  location: "<ROOM NAME>"
