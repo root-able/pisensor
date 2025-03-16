@@ -38,7 +38,7 @@ class HassPoster:
         }
         self.location = self.config["location"]
         self.sensors = {
-            sensor_config["sensor_name"]: sensor_config["sensor_device"]
+            sensor_config["name"]: sensor_config["device"]
             for sensor_config in self.config["sensors"]
         }
 
@@ -46,9 +46,9 @@ class HassPoster:
 
     def run_sensors(self):
 
-        for sensor_name, sensor_dev in self.sensors:
+        for sensor_name, sensor_dev in self.sensors.items():
 
-            if sensor_name == "sen5":
+            if sensor_name == "sen55":
                 sensor_instance = sensor_sen55()
                 self.measures[sensor_name] = sensor_instance.get_measures(iterations=10)
 
