@@ -10,68 +10,92 @@ from commons import (
 )
 
 from pisensor_sen55 import sensor_sen55
+from pisensor_scd41 import scd41_get_measures
 
 
-def update_hass_sensor(
-    config: dict,
-    sensor_name: str,
-    sensor_data: dict,
-) -> None:
-    """Used to update a sensor data in Home Assistant"""
+# Classes
+class HassPoster:
 
-    sensor_name = "{location} - {device} - {sensor}".format(
-        location=config["location"],
-        device="sen55",
-        sensor=sensor_name,
-    )
-    sensor_name_short = get_snake_case(sensor_name)
-    sensor_value = sensor_data["value"]
-    sensor_unit = sensor_data["unit"]
+    def __init__(self):
+        self.config = dict()
+        self.http_base_url = str()
+        self.http_header = dict()
+        self.location = str()
+        self.sensors = list()
+        self.measures = dict()
 
-    http_url = "http://{host}:{port}/api/states/sensor.{sensor}".format(
-        host=config["host"],
-        port=config["port"],
-        sensor=sensor_name_short,
-    )
-    http_header = {
-        "Authorization": "Bearer {token}".format(token=config["token"]),
-        "content-type": "application/json",
-    }
-    http_payload = {
-        "state": sensor_value,
-        "attributes": {
-            "unit_of_measurement": sensor_unit,
-            "friendly_name": sensor_name,
-        },
-    }
-    http_response = requests.post(
-        http_url,
-        headers=http_header,
-        data=json.dumps(http_payload),
-    )
-    print(http_response.text)
-    time.sleep(0.1)
-
-
-def sen_use(
-    config_file_name: str,
-) -> None:
-    """Used to pull measure data from i2c sensirion device"""
-
-    sen_settings = read_yaml(
-        config_file_name,
-    ).get("home_assistant", dict())
-
-    sen_sensor = sensor_sen55()
-
-    sen_measures = sen_sensor.get_measures(iterations=10)
-    for measure_name, measure_data in sen_measures.items():
-        update_hass_sensor(
-            sen_settings,
-            measure_name,
-            measure_data,
+    def get_config(self, file_name: str) -> dict:
+        self.config = read_yaml(
+            file_name,
+        ).get("home_assistant", dict())
+        self.http_base_url = "http://{host}:{port}/api/states/sensor".format(
+            host=self.config["host"],
+            port=self.config["port"],
         )
+        self.http_header = {
+            "Authorization": "Bearer {token}".format(token=self.config["token"]),
+            "content-type": "application/json",
+        }
+        self.location = self.config["location"]
+        self.sensors = {
+            sensor_config["sensor_name"]: sensor_config["sensor_device"]
+            for sensor_config in self.config["sensors"]
+        }
+
+        return self.config
+
+    def run_sensors(self):
+
+        for sensor_name, sensor_dev in self.sensors:
+
+            if sensor_name == "sen5":
+                sensor_instance = sensor_sen55()
+                self.measures[sensor_name] = sensor_instance.get_measures(iterations=10)
+
+            elif sensor_name == "scd41":
+                self.measures[sensor_name] = scd41_get_measures(self.config)
+
+    def post_results(
+        self,
+        query_interval: int = 0.1,
+    ):
+
+        for sensor_name, sensor_measures in self.measures.items():
+            for measure_name, measure_data in sensor_measures.items():
+
+                measure_name_full = "{location} - {device} - {sensor}".format(
+                    location=self.location,
+                    device=sensor_name,
+                    sensor=measure_name,
+                )
+                http_url = ".".join(
+                    [
+                        self.http_base_url.format(),
+                        get_snake_case(measure_name_full),
+                    ]
+                )
+
+                measure_value = measure_data["value"]
+                measure_unit = measure_data["unit"]
+                http_payload = {
+                    "state": measure_value,
+                    "attributes": {
+                        "unit_of_measurement": measure_unit,
+                        "friendly_name": measure_name_full,
+                    },
+                }
+
+                http_response = requests.post(
+                    http_url,
+                    headers=self.http_header,
+                    data=json.dumps(http_payload),
+                )
+                print(http_response.text)
+                time.sleep(query_interval)
 
 
 # MAIN
-sen_use("settings.yaml")
+client = HassPoster()
+client.get_config(file_name="settings.yaml")
+client.run_sensors()
+client.post_results()

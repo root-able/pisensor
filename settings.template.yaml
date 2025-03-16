@@ -7,5 +7,3 @@ home_assistant:
   sensors:
     - name: "sen55"
       device: "/dev/i2c-1"
-    - name: "scd41"
-      device: "/dev/i2c-1"
