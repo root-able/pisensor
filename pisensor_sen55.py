@@ -2,18 +2,16 @@
 
 import time
 
-from commons import (
-    get_byid_split,
-)
-
 from sensirion_i2c_driver import (
     I2cConnection,
     LinuxI2cTransceiver,
 )
 from sensirion_i2c_sen5x import Sen5xI2cDevice
 
+from commons import get_byid_split
 
-# CLASSES
+
+# FUNCTIONS
 def process_measures(
     values,
 ) -> dict:
@@ -42,6 +40,7 @@ def process_measures(
     return measured_data
 
 
+# CLASS
 class sensor_sen55:
 
     def __init__(

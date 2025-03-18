@@ -10,7 +10,7 @@ from commons import (
 )
 
 from pisensor_sen55 import sensor_sen55
-from pisensor_scd41 import scd41_get_measures
+from pisensor_scd41 import sensor_scd41
 
 
 # Classes
@@ -53,7 +53,8 @@ class HassPoster:
                 self.measures[sensor_name] = sensor_instance.get_measures(iterations=10)
 
             elif sensor_name == "scd41":
-                self.measures[sensor_name] = scd41_get_measures(self.config)
+                sensor_instance = sensor_scd41()
+                self.measures[sensor_name] = sensor_instance.get_measures()
 
     def post_results(
         self,
