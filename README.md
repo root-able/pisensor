@@ -1,6 +1,6 @@
 # pisensor
 
-The objective of this project is to enable reporting for sensors of the SCD4X family to a Home Assistant instance, in the simplest and most straightforward way.
+The objective of this project is to enable reporting for sensors of the Sensirion Brand to a Home Assistant instance, in the simplest and most straightforward way.
 
 ## Pre-Requisites
 
@@ -9,26 +9,49 @@ The objective of this project is to enable reporting for sensors of the SCD4X fa
 The code provided by this project is meant to be used in the following hardware configuration:
 
 - Raspberry Pi or other ARM-based, GPIO-enabled compatible device.
-- A sensor of the SCD4X family.
-- Connection wires to bridge the two devices together.
+- A sensor built by Sensirion company.
+- Connection wires to bridge all devices together.
 
-#### Connection Pattern
+#### SCD41
 
-The connection pattern between the two devices must respect the one described in [Sensirion's documentation](https://github.com/Sensirion/python-i2c-scd4x?tab=readme-ov-file#connect-the-sensor).
-Here is a short summary of the connection pattern between each of the 4 connectors of the sensor, to the Raspberry Pi GPIO:
+The specific connection steps below apply to sensors of the SCD41 family.
+
+The connection pattern between the sensor and GPIO-enabled device must match the one described in [Sensirion's documentation](https://github.com/Sensirion/python-i2c-scd4x?tab=readme-ov-file#connect-the-sensor).
+Here is a short summary of the connection pattern between each of the 4 connectors of the sensor, to the Raspberry Pi's GPIO:
 
 - <u>VCC:</u> *Pin 1*
 - <u>SDA:</u> *Pin 3*
 - <u>SCL:</u> *Pin 5*
 - <u>GND:</u> *Pin 6*
 
-With this connection pattern, the sensor should then be physically available through the I2C bus.
+#### SEN55
 
-<u><i>Note:</i></u> SDA and SCL pins may be mutualized if already in use by other GPIO-connected devices. However, be aware that a pull-up resistance may sometime be required depending on the hardware configuration.
+The specific connection steps below apply to sensors of the SEN55 family.
+
+The connection pattern between the sensor and GPIO-enabled device must match the one described in [Sensirion's documentation](https://github.com/Sensirion/embedded-i2c-sen5x?tab=readme-ov-file#connecting-the-sensor).
+Here is a short summary of the connection pattern between each of the 5 (out of 6) sensor connectors that should be connected to the Raspberry Pi's GPIO:
+
+- <u>VCC:</u> *Pin 1*
+- <u>GND:</u> *Pin 2*
+- <u>SDA:</u> *Pin 3*
+- <u>SCL:</u> *Pin 4*
+- <u>GND:</u> *Pin 5* (This selects I2C interface mode)
+- <u>Not Connected:</u> *Pin 6*
+
+
+#### Additional Considerations
+
+With this connection patterns in place, all sensor should then be physically available through the I2C bus to the GPIO-enabled device.
+In most cases, SDA and SCL pins may be mutualized between multiple devices. However, with a high device count, additional pull-up resistors may sometime be required.
+
 
 ### Software
 
-This project relies on [python drivers](https://github.com/Sensirion/python-i2c-scd4x) provided by Sensirion for the SCD4x sensor family.
+This project relies on the respective python drivers provided by Sensirion for all their sensors families.
+These are dependencies, and associated code may be found in following repositories:
+
+- [SCD41 Python Driver](https://github.com/Sensirion/python-i2c-scd4x)
+- [SEN55 Python Driver](https://github.com/Sensirion/python-i2c-sen5x)
 
 ## Initial Setup
 
@@ -37,8 +60,10 @@ This project relies on [python drivers](https://github.com/Sensirion/python-i2c-
 In order to make sure that the sensor is available at the software level, the following verification must be performed:
 
 - The I2C interface is enabled on the Raspberry Pi.
-- The I2C address of the device is set to the [default driver configuration of 0x62](https://github.com/Sensirion/python-i2c-scd4x?tab=readme-ov-file#supported-sensor-types).
-
+- The I2C address of the device is set to the following default configurations:
+  - <u>SCD41 Defaults:</u> [`0x62`](https://github.com/Sensirion/python-i2c-scd4x?tab=readme-ov-file#supported-sensor-types)
+  - <u>SEN55 Defaults:</u> `0x69`
+  
 To perform these verifications, follow the steps listed below.
 
 #### Enable I2C Interface
@@ -59,8 +84,8 @@ sudo init 6
 #### Verify I2C Address
 
 ```bash
-# Verify that I2C address 62 is populated
- i2cdetect -y 1 | grep 62
+# Verify that I2C address are populated
+i2cdetect -y 1
 ```
 
 ### Clone Repository
@@ -81,7 +106,7 @@ cd ${DEST_FOLDER}
 # Create a configuration file from template
 cp -v settings.template.yaml settings.yaml
 
-# Fill in configuration file with private info (API token, host name, ...)
+# Fill in configuration file with private info (API token, host name, device address, ...)
 vi settings.yaml
 ```
 
@@ -103,15 +128,15 @@ USER_NAME="<USER_NAME>"
 chown -R ${USER_NAME}:${USER_NAME} ${DEST_FOLDER}
 
 # Make sure that the script is running fine
-sudo -u ${USER_NAME} .venv/bin/python pisensor_scd41.py
+sudo -u ${USER_NAME} .venv/bin/python pisensor.py
 ```
 
 ### Configure Scheduling
 
 ```bash
 # Create a cron job file
-echo "* * * * * ${USER_NAME} ${DEST_FOLDER}/.venv/bin/python ${DEST_FOLDER}/pisensor_scd41.py >> ${DEST_FOLDER}/pisensor_scd41.log 2&>1" > /etc/cron.d/pisensor_scd41
+echo "* * * * * ${USER_NAME} ${DEST_FOLDER}/.venv/bin/python ${DEST_FOLDER}/pisensor.py >> ${DEST_FOLDER}/pisensor.log 2&>1" > /etc/cron.d/pisensor
 
 # Monitor output log file for new execution runs
-touch "${DEST_FOLDER}/pisensor_scd41.log" && tail -f "${DEST_FOLDER}/pisensor_scd41.log"
+touch "${DEST_FOLDER}/pisensor.log" && tail -f "${DEST_FOLDER}/pisensor.log"
 ```
