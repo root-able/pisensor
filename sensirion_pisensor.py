@@ -10,7 +10,7 @@ from commons import (
 )
 
 from sensirion import sensor_sen55
-from pisensor_scd41 import sensor_scd41
+from sensirion import sensor_scd41
 
 
 # Classes
