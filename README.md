@@ -128,7 +128,7 @@ USER_NAME="<USER_NAME>"
 chown -R ${USER_NAME}:${USER_NAME} ${DEST_FOLDER}
 
 # Make sure that the script is running fine
-sudo -u ${USER_NAME} .venv/bin/python pisensor.py
+sudo -u ${USER_NAME} .venv/bin/python sensirion_pisensor.py
 ```
 
 ### Configure Scheduling

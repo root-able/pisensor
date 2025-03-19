@@ -9,7 +9,7 @@ from commons import (
     get_snake_case,
 )
 
-from pisensor_sen55 import sensor_sen55
+from sensirion import sensor_sen55
 from pisensor_scd41 import sensor_scd41
 
 
