@@ -33,6 +33,7 @@ class sensirion_sensor:
     ) -> dict:
         """Process collected sensirion measures"""
 
+        measure_id = 0
         for measure_object in self.measure_values:
 
             measure_rawvalue, measure_unit = get_byid_split(
@@ -41,11 +42,12 @@ class sensirion_sensor:
                 default_value="Index",
                 items_count=2,
             )
-            measure_name = self.measure_names.pop()
+            measure_name = self.measure_names[measure_id]
             self.measure_data[measure_name] = {
-                "value": round(measure_rawvalue, precision),
+                "value": round(float(measure_rawvalue), precision),
                 "unit": measure_unit,
             }
+            measure_id += 1
 
         return self.measure_data
 
@@ -80,7 +82,7 @@ class sensor_scd41(sensirion_sensor):
         # Process data
         self.process_measures()
 
-        return self.meaasure_data
+        return self.measure_data
 
 
 class sensor_sen55(sensirion_sensor):
