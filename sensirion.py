@@ -62,9 +62,10 @@ class sensor_scd41(sensirion_sensor):
 
         super().__init__(sensor_dev)
         self.device = Scd4xI2cDevice(self.i2c_link)
+        self.measure_names = ["CO2", "Temperature", "Humidity"]
 
-    def get_measures(self) -> dict:
-        """Used to pull measure data from i2c scd41 device"""
+    def get_measures(self) -> None:
+        """Used to collect raw measure data from i2c scd41 device"""
 
         # Stop all existing periodic measures
         self.device.stop_periodic_measurement()
@@ -76,13 +77,15 @@ class sensor_scd41(sensirion_sensor):
         self.device.measure_single_shot()
 
         # Retrieve measured values
-        self.measure_names = ["CO2", "Temperature", "Humidity"]
         self.rawdata = self.device.read_measurement()
 
-        # Process data
-        self.process_measures()
+    def process_measures(
+        self,
+    ) -> None:
+        """Process collected scd41 measures"""
 
-        return self.measure_data
+        self.measure_values = self.rawdata
+        super().process_measures()
 
 
 class sensor_sen55(sensirion_sensor):
@@ -98,7 +101,7 @@ class sensor_sen55(sensirion_sensor):
 
     def process_measures(
         self,
-    ) -> dict:
+    ) -> None:
         """Process collected sen55 measures"""
 
         for measure in self.rawdata.to_str(",").split(","):
@@ -113,13 +116,11 @@ class sensor_sen55(sensirion_sensor):
 
         super().process_measures()
 
-        return self.measure_data
-
     def get_measures(
         self,
         interval: int = 0.1,
         iterations: int = 10,
-    ) -> dict:
+    ) -> None:
         """Initiate measurement"""
 
         # Begin measure
@@ -134,12 +135,9 @@ class sensor_sen55(sensirion_sensor):
 
             # Collect measures and process them
             self.rawdata = self.device.read_measured_values()
-            self.process_measures()
 
         # Stop measurement
         self.device.stop_measurement()
-
-        return self.measure_data
 
     def print_details(
         self,

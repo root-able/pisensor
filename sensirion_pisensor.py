@@ -9,8 +9,11 @@ from commons import (
     get_snake_case,
 )
 
-from sensirion import sensor_sen55
-from sensirion import sensor_scd41
+from sensirion import (
+    sensirion_sensor,
+    sensor_scd41,
+    sensor_sen55,
+)
 
 
 # Classes
@@ -48,13 +51,20 @@ class HassPoster:
 
         for sensor_name, sensor_dev in self.sensors.items():
 
+            sensor_instance = sensirion_sensor()
             if sensor_name == "sen55":
                 sensor_instance = sensor_sen55()
-                self.measures[sensor_name] = sensor_instance.get_measures(iterations=10)
+                sensor_instance.get_measures(iterations=10)
 
             elif sensor_name == "scd41":
                 sensor_instance = sensor_scd41()
-                self.measures[sensor_name] = sensor_instance.get_measures()
+                sensor_instance.get_measures()
+
+            else:
+                exit()
+
+            sensor_instance.process_measures()
+            self.measures[sensor_name] = sensor_instance.measure_data
 
     def post_results(
         self,
