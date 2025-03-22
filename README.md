@@ -104,7 +104,7 @@ cd ${DEST_FOLDER}
 ### Fill In Configuration
 ```bash
 # Create a configuration file from template
-cp -v settings.template.yaml settings.yaml
+cp -v templates/settings.yaml settings.yaml
 
 # Fill in configuration file with private info (API token, host name, device address, ...)
 vi settings.yaml
@@ -139,7 +139,7 @@ To ensure continuous execution of the `pisensor` poller, the recommended way is 
 
 ```bash
 # Create a service file using template
-cp -v pisensor.service /etc/systemd/system
+cp -v templates/pisensor.service /etc/systemd/system
 
 # Replace placeholder home folder with actual deployment value
 sed -i "s/<DEST_FOLDER>/${DEST_FOLDER}/g" /etc/systemd/system
