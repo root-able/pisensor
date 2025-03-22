@@ -16,9 +16,13 @@ from sensirion import (
 )
 
 
+# TODO: Rename to pisensirion
+
+
 # Classes
 class HassPoster:
 
+    # TODO: Split in HASS client class and a sensor handler class
     def __init__(self):
         self.config = dict()
         self.http_base_url = str()
@@ -128,6 +132,7 @@ class HassPoster:
 
 
 # MAIN
+# TODO: move to dedicated function/external object/module
 client = HassPoster()
 client.get_config(file_name="settings.yaml")
 client.get_sensors()

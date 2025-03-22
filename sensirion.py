@@ -15,6 +15,9 @@ from commons import (
 )
 
 
+# TODO: Rename to pisensirion_sensors
+
+
 # CLASSES
 class SensirionSensor:
 
