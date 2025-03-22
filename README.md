@@ -149,7 +149,7 @@ systemctl daemon-reload
 systemctl start pisensor 
 
 # Check service status
-systemctl start pisensor 
+systemctl status pisensor 
 
 # Enable service to start at boot
 systemctl enable pisensor 
