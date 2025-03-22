@@ -137,7 +137,7 @@ while True:
     try:
         client.run_sensors()
         client.post_sensors()
-        time.sleep(client.config["interval_min"])
+        time.sleep(client.config["interval_min"] * 60)
 
     except:
         break
