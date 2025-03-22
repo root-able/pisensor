@@ -138,11 +138,9 @@ sudo -u ${USER_NAME} .venv/bin/python sensirion_pisensor.py
 To ensure continuous execution of the `pisensor` poller, the recommended way is to install a dedicated systemctl service. This ensures continuous polling of all Sensirion sensors.
 
 ```bash
-# Create a service file using template
-cp -v templates/pisensor.service /etc/systemd/system
-
 # Replace placeholder home folder with actual deployment value
-sed -i "s/<DEST_FOLDER>/${DEST_FOLDER}/g" /etc/systemd/system
+SED_FOLDER=$(echo $DEST_FOLDER | sed 's/\//\\\//g')
+cat templates/pisensor.service | sed -i "s/<DEST_FOLDER>/${SED_FOLDER}/g" > /etc/systemd/system/pisensor.service
 
 # Reload services
 systemctl daemon-reload 
