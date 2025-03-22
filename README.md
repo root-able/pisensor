@@ -100,10 +100,7 @@ git clone https://github.com/root-able/pisensor.git ${DEST_FOLDER}
 # Move into repo content
 cd ${DEST_FOLDER}
 ```
-/etc/systemd/system
-systemctl daemon-reload 
-systemctl enable pisensor 
-systemctl start pisensor 
+
 ### Fill In Configuration
 ```bash
 # Create a configuration file from template
@@ -135,6 +132,34 @@ sudo -u ${USER_NAME} .venv/bin/python sensirion_pisensor.py
 ```
 
 ### Configure Scheduling
+
+#### Systemctl Service
+
+To ensure continuous execution of the `pisensor` poller, the recommended way is to install a dedicated systemctl service. This ensures continuous polling of all Sensirion sensors.
+
+```bash
+# Create a service file using template
+cp -v pisensor.service /etc/systemd/system
+
+# Replace placeholder home folder with actual deployment value
+sed -i "s/<DEST_FOLDER>/${DEST_FOLDER}/g" /etc/systemd/system
+
+# Reload services
+systemctl daemon-reload 
+
+# Start service
+systemctl start pisensor 
+
+# Check service status
+systemctl start pisensor 
+
+# Enable service to start at boot
+systemctl enable pisensor 
+```
+
+#### Scheduled Task
+
+Another possibility to schedule the execution of the `pisensor` poller is to use a linux scheduled task. However, since some measures use historical data derivation (NOC, VOC), this may prevent getting accurate values for these measures. This option is therefore less recommended than using a systemctl service creation.
 
 ```bash
 # Create a cron job file
