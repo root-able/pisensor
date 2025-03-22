@@ -109,7 +109,7 @@ class SensorScd41(SensirionSensor):
 
     def process_measures(
         self,
-        default_unit: str,
+        default_unit: str = "Unknown",
         precision: int = 1,
     ) -> dict:
         """Used to process raw measure data to  analyzed data"""
