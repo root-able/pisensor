@@ -121,6 +121,7 @@ class HassPoster:
         query_interval: int = 0.1,
     ) -> None:
         """Post the sensor results"""
+        self.prepare_http()
         for sensor_name, sensor_instance in self.sensors.items():
             sensor_measures = sensor_instance.measure_data
             for measure_name, measure_data in sensor_measures.items():
