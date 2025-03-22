@@ -8,7 +8,7 @@ Type=simple
 Restart=always
 RestartSec=1
 User=root
-ExecStart=<DEST_FOLDER>/.bin/python <DEST_FOLDER>/sensirion_pisensor.py
+ExecStart=<DEST_FOLDER>/.venv/bin/python <DEST_FOLDER>/sensirion_pisensor.py
 
 [Install]
 WantedBy=multi-user.target

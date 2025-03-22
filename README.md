@@ -140,7 +140,7 @@ To ensure continuous execution of the `pisensor` poller, the recommended way is 
 ```bash
 # Replace placeholder home folder with actual deployment value
 SED_FOLDER=$(echo $DEST_FOLDER | sed 's/\//\\\//g')
-cat templates/pisensor.service | sed -i "s/<DEST_FOLDER>/${SED_FOLDER}/g" > /etc/systemd/system/pisensor.service
+cat templates/pisensor.service | sed -e "s/<DEST_FOLDER>/${SED_FOLDER}/g" > /etc/systemd/system/pisensor.service
 
 # Reload services
 systemctl daemon-reload 
