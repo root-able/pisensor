@@ -71,7 +71,7 @@ def get_byid_split(
     return split_values
 
 
-# String processing utilities
+# Simple objects (str, int, float) processing utilities
 def get_snake_case(
     input_string: str,
 ) -> str:
@@ -106,3 +106,16 @@ def get_snake_case(
         )
 
     return "_".join(clean_string.split()).lower()
+
+
+def clean_float(
+    input_value: float,
+    replacement_value: float,
+    precision: int,
+) -> float:
+    """Clean integer and replace it if required"""
+    try:
+        cleaned_value = round(float(input_value), precision)
+    except:
+        cleaned_value = replacement_value
+    return cleaned_value

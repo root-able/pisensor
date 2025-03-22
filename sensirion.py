@@ -9,21 +9,10 @@ from sensirion_i2c_driver import (
 from sensirion_i2c_scd import Scd4xI2cDevice
 from sensirion_i2c_sen5x import Sen5xI2cDevice
 
-from commons import get_byid_split
-
-
-# FUNCTIONS
-def clean_float(
-    input_value: float,
-    replacement_value: float,
-    precision: int,
-) -> float:
-    """Clean integer and replace it if required"""
-    try:
-        cleaned_value = round(float(input_value), precision)
-    except:
-        cleaned_value = replacement_value
-    return cleaned_value
+from commons import (
+    get_byid_split,
+    clean_float,
+)
 
 
 # CLASSES
