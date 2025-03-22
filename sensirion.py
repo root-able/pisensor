@@ -13,11 +13,11 @@ from commons import get_byid_split
 
 
 # CLASSES
-class sensirion_sensor:
+class SensirionSensor:
 
     def __init__(
         self,
-        sensor_dev: str = "/dev/i2c-1",
+        sensor_dev: str,
     ):
         """Instanciate object"""
         self.i2c_link = I2cConnection(LinuxI2cTransceiver(sensor_dev))
@@ -26,10 +26,26 @@ class sensirion_sensor:
         self.measure_values = list()
         self.measure_data = dict()
 
+    def reset(self) -> None:
+        """Reset sensirion sensor"""
+        return None
+
+    def start(self) -> None:
+        """Start sensirion measurment session"""
+        return None
+
+    def stop(self) -> None:
+        """Stop sensirion measurment session"""
+        return None
+
+    def get_measures(self) -> None:
+        """Collect sensirion measures"""
+        return None
+
     def process_measures(
         self,
-        precision: int = 1,
-        default_value: str = "Index",
+        default_unit: str,
+        precision: int,
     ) -> dict:
         """Process collected sensirion measures"""
 
@@ -52,7 +68,7 @@ class sensirion_sensor:
         return self.measure_data
 
 
-class sensor_scd41(sensirion_sensor):
+class SensorScd41(SensirionSensor):
 
     def __init__(
         self,
@@ -64,46 +80,72 @@ class sensor_scd41(sensirion_sensor):
         self.device = Scd4xI2cDevice(self.i2c_link)
         self.measure_names = ["CO2", "Temperature", "Humidity"]
 
-    def get_measures(self) -> None:
-        """Used to collect raw measure data from i2c scd41 device"""
-
-        # Stop all existing periodic measures
+    def reset(self) -> None:
+        """Used to reset the status of the sensor"""
         self.device.stop_periodic_measurement()
 
-        # Put device in idle mode by waking it up
+    def start(self) -> None:
+        """Used to begin a measurement session"""
         self.device.wake_up()
 
-        # Initiate a single shot measure
+    def get_measures(self) -> None:
+        """Used to collect raw measure data from i2c scd41 device"""
         self.device.measure_single_shot()
-
-        # Retrieve measured values
         self.rawdata = self.device.read_measurement()
 
     def process_measures(
         self,
-    ) -> None:
-        """Process collected scd41 measures"""
-
+        default_unit: str,
+        precision: int = 1,
+    ) -> dict:
+        """Used to process raw measure data to  analyzed data"""
         self.measure_values = self.rawdata
-        super().process_measures()
+        return super().process_measures(default_unit, precision)
 
 
-class sensor_sen55(sensirion_sensor):
+class SensorSen55(SensirionSensor):
 
     def __init__(
         self,
         sensor_dev: str = "/dev/i2c-1",
     ):
         """Instanciate object"""
-
         super().__init__(sensor_dev)
         self.device = Sen5xI2cDevice(self.i2c_link)
 
+    def reset(
+        self,
+    ):
+        """Used to reset the status of the sensor"""
+        self.device.device_reset()
+
+    def start(
+        self,
+    ):
+        """Used to begin a measurement session"""
+        self.device.start_measurement()
+
+    def stop(
+        self,
+    ):
+        """Used to end a measurement session"""
+        self.device.stop_measurement()
+
+    def get_measures(
+        self,
+        interval: int = 1,
+    ) -> None:
+        """Used to collect raw measure data from i2c sen55 device"""
+        while self.device.read_data_ready() is False:
+            time.sleep(interval)
+        self.rawdata = self.device.read_measured_values()
+
     def process_measures(
         self,
-    ) -> None:
+        default_unit: str = "Index",
+        precision: int = 1,
+    ) -> dict:
         """Process collected sen55 measures"""
-
         for measure in self.rawdata.to_str(",").split(","):
             measure_name, measure_value = get_byid_split(
                 input_string=measure,
@@ -114,45 +156,13 @@ class sensor_sen55(sensirion_sensor):
             self.measure_names.append(measure_name)
             self.measure_values.append(measure_value)
 
-        super().process_measures()
-
-    def get_measures(
-        self,
-        interval: int = 0.1,
-        iterations: int = 10,
-    ) -> None:
-        """Initiate measurement"""
-
-        # Begin measure
-        self.device.start_measurement()
-
-        # Iterate specified number of times
-        for i in range(iterations):
-
-            # Wait until next result is available
-            while self.device.read_data_ready() is False:
-                time.sleep(interval)
-
-            # Collect measures and process them
-            self.rawdata = self.device.read_measured_values()
-
-        # Stop measurement
-        self.device.stop_measurement()
+        return super().process_measures(default_unit, precision)
 
     def print_details(
         self,
     ):
         """Print some device information"""
-
-        # Getting device details
         print(f"Version: {self.device.get_version()}")
         print(f"Product Name: {self.device.get_product_name()}")
         print(f"Serial Number: {self.device.get_serial_number()}")
         print(f"Device Status: {self.device.read_device_status()}")
-
-    def reset(
-        self,
-    ):
-        """Reset device"""
-
-        self.device.device_reset()
