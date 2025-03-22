@@ -20,7 +20,7 @@ def clean_float(
 ) -> float:
     """Clean integer and replace it if required"""
 
-    if isinstance(input_value):
+    if isinstance(input_value, int):
         return round(float(input_value), precision)
     else:
         return replacement_value
