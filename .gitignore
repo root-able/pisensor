@@ -5,7 +5,7 @@
 .idea
 
 # Configuration file with private information
-settings.yaml
+./settings.yaml
 
 # Prevent log file tracking
 *.log
