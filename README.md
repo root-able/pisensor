@@ -100,7 +100,10 @@ git clone https://github.com/root-able/pisensor.git ${DEST_FOLDER}
 # Move into repo content
 cd ${DEST_FOLDER}
 ```
-
+/etc/systemd/system
+systemctl daemon-reload 
+systemctl enable pisensor 
+systemctl start pisensor 
 ### Fill In Configuration
 ```bash
 # Create a configuration file from template

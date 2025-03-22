@@ -19,11 +19,11 @@ def clean_float(
     precision: int,
 ) -> float:
     """Clean integer and replace it if required"""
-
-    if isinstance(input_value, int):
-        return round(float(input_value), precision)
-    else:
-        return replacement_value
+    try:
+        cleaned_value = round(float(input_value), precision)
+    except:
+        cleaned_value = replacement_value
+    return cleaned_value
 
 
 # CLASSES
