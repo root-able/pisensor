@@ -12,6 +12,20 @@ from sensirion_i2c_sen5x import Sen5xI2cDevice
 from commons import get_byid_split
 
 
+# FUNCTIONS
+def clean_float(
+    input_value: float,
+    replacement_value: float,
+    precision: int,
+) -> float:
+    """Clean integer and replace it if required"""
+
+    if isinstance(input_value):
+        return round(float(input_value), precision)
+    else:
+        return replacement_value
+
+
 # CLASSES
 class SensirionSensor:
 
@@ -60,7 +74,7 @@ class SensirionSensor:
             )
             measure_name = self.measure_names[measure_id]
             self.measure_data[measure_name] = {
-                "value": round(float(measure_rawvalue), precision),
+                "value": clean_float(measure_rawvalue, 0.0, precision),
                 "unit": measure_unit,
             }
             measure_id += 1
