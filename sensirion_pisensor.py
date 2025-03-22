@@ -23,7 +23,6 @@ class HassPoster:
         self.config = dict()
         self.http_base_url = str()
         self.http_header = dict()
-        self.location = str()
         self.sensors = dict()
 
     def get_config(self, file_name: str) -> None:
@@ -31,7 +30,6 @@ class HassPoster:
         self.config = read_yaml(
             file_name,
         ).get("home_assistant", dict())
-        self.location = self.config["location"]
 
     def get_sensors(self) -> None:
         """Get sensors from configuration"""
@@ -71,7 +69,7 @@ class HassPoster:
         measure_data: dict,
     ):
         measure_name_full = "{location} - {device} - {sensor}".format(
-            location=self.location,
+            location=self.config["location"],
             device=sensor_name,
             sensor=measure_name,
         )
@@ -134,6 +132,14 @@ client = HassPoster()
 client.get_config(file_name="settings.yaml")
 client.get_sensors()
 client.start_sensors()
-client.run_sensors()
+
+while True:
+    try:
+        client.run_sensors()
+        client.post_sensors()
+        time.sleep(client.config["interval_min"])
+
+    except:
+        break
+
 client.stop_sensors()
-client.post_sensors()
