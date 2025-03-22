@@ -131,6 +131,7 @@ class HassPoster:
 # MAIN
 client = HassPoster()
 client.get_config(file_name="settings.yaml")
+client.get_sensors()
 client.start_sensors()
 client.run_sensors()
 client.stop_sensors()
