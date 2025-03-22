@@ -17,6 +17,7 @@ from sensirion import (
 
 
 # TODO: Rename to pisensirion
+# TODO: Add Logging
 
 
 # Classes
