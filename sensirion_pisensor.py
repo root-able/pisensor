@@ -53,7 +53,18 @@ class HassPoster:
 
     def prepare_http(self) -> None:
         """Prepare HTTP required config"""
-        self.http_base_url = "http://{host}:{port}/api/states/sensor".format(
+
+        if self.config["port"] == 443:
+            self.config["proto"] = "https"
+            print("Enabling TLS connectivity")
+        elif "proto" not in self.config:
+            self.config["proto"] = "http"
+            print("Switching to plaintext HTTP")
+        else:
+            print(f"Protocol already defined to \"{self.config['proto']}\"")
+
+        self.http_base_url = "{proto}://{host}:{port}/api/states/sensor".format(
+            proto=self.config["proto"],
             host=self.config["host"],
             port=self.config["port"],
         )
@@ -61,6 +72,7 @@ class HassPoster:
             "Authorization": "Bearer {token}".format(token=self.config["token"]),
             "content-type": "application/json",
         }
+        print(f"Base URL to use would be http_url=\"{self.http_base_url}\"")
 
     def post_results(
         self,
